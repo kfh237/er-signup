@@ -46,9 +46,9 @@
       });
     } else {
       student = new Array(8);
-      // leave the form empty
-      // remove the 'make changes' button
-      // bind a createStudent function to remaining button click event
+      document.querySelectorAll('#student-info input, #class').forEach((el) => el.removeAttribute('disabled'));
+      document.querySelector('#update-info').remove();
+      document.querySelector('#confirm-info').addEventListener('click', createStudent);
     }
 
     main.classList.remove('loading');
@@ -56,38 +56,43 @@
 
   const createStudent = (event) => {
     event.preventDefault();
+
+    document.querySelectorAll('#student-info input').forEach((input, i) => {
+      student[i] = input.value;
+    });
+
+    document.querySelectorAll('#class option').forEach((option) => {
+      if (option.selected) student[7] = option.value;
+    });
+
+    proceed();
   }
 
   const updateStudent = (event) => {
     event.preventDefault();
 
     let inputs = document.querySelectorAll('#student-info input');
-    let changed = false;
 
     if (event.target.id == 'update-info') {
-      inputs.forEach((input) => {
-        input.removeAttribute('disabled');
-      });
+      inputs.forEach((input) => input.removeAttribute('disabled'));
 
       document.querySelector('#class').removeAttribute('disabled');
 
       event.target.setAttribute('disabled', '');
     } else {
       main.classList.add('loading');
-      let data = [];
 
       inputs.forEach((input, i) => {
         if (input.value != input.defaultValue) {
-          data[i] = input.value;
-          changed = true;
+          student[i] = input.value;
         }
       });
 
-      if (changed) {
-        google.script.run.withSuccessHandler(proceed).updateStudent(data);
-      } else {
-        proceed();
-      }
+      document.querySelectorAll('#class option').forEach((option) => {
+        if (option.selected) student[7] = option.value;
+      });
+
+      proceed();
     }
   }
 
@@ -98,18 +103,19 @@
 
   const proceed = (event) => {
     if (!!event) event.preventDefault();
+    main.classList.add('loading');
+
 
     let netid;
     if (step == 0) {
       netid = document.querySelector('#netid').value;
+      document.querySelector('.field-0').remove();
     }
 
     if (step == 2 && !document.getElementById('agree').checked) {
       alert('You must check the box to proceed');
       return;
     }
-
-    main.classList.add('loading');
 
     let section = sections[step];
 
@@ -118,9 +124,7 @@
 
       switch(step) {
         case 0:
-          document.querySelectorAll('.field-0, #next').forEach((el) => {
-            el.classList.add('hidden');
-          });
+          document.querySelector('#next').classList.add('hidden');
           google.script.run.withSuccessHandler(studentInfo).lookupStudent(netid);
           break;
         case 1:
@@ -129,7 +133,7 @@
           break;
         case 2:
           document.querySelector('#next').classList.add('hidden');
-          google.script.run.withSuccessHandler(showConfirmation).submitAgreement();
+          google.script.run.withSuccessHandler(showConfirmation).submitAgreement(student);
           break;
         default:
           main.classList.remove('loading');
