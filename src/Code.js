@@ -47,7 +47,7 @@ function lookupStudent(netid) {
     return JSON.stringify(data);
   } catch (e) {
     Logger.error(e);
-    return { 'type': 3, 'error': e };
+    return JSON.stringify({ 'type': 3, 'error': e });
   }
 }
 
@@ -70,7 +70,7 @@ function submitAgreement(student) {
 
     return true;
   } catch(e) {
-    Logger.log(e);
+    Logger.error(e);
     return false;
   }
 }
