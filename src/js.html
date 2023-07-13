@@ -23,34 +23,52 @@
     sectionContent.innerHTML = content;
   };
 
-  const studentInfo = (_student) => {
-    student = _student;
-    console.log(student);
+  const studentInfo = (_data) => {
+    let data = JSON.parse(_data);
+    console.log(data);
 
     let inputs = document.querySelectorAll('#student-info input');
     let classOptions = document.querySelectorAll('#class option');
     let buttons = document.querySelectorAll('#student-info button');
 
-    if (!!student) {
-      inputs.forEach((input, i) => {
-        input.defaultValue = student[i];
-        input.value = student[i];
-      });
+    switch (data.type) {
+      case 1:
+        // load from seed data
+        student = data.student;
 
-      classOptions.forEach((option) => {
-        if (option.value == student[7]) option.setAttribute('selected', '');
-      });
+        inputs.forEach((input, i) => {
+          input.defaultValue = student[i];
+          input.value = student[i];
+        });
 
-      buttons.forEach((button, i) => {
-        button.addEventListener('click', updateStudent);
-      });
-    } else {
-      student = new Array(8);
-      document.querySelectorAll('#student-info input, #class').forEach((el) => el.removeAttribute('disabled'));
-      document.querySelector('#update-info').remove();
-      document.querySelector('#confirm-info').addEventListener('click', createStudent);
-    }
+        classOptions.forEach((option) => {
+          if (option.value == student[7]) option.setAttribute('selected', '');
+        });
 
+        buttons.forEach((button, i) => {
+          button.addEventListener('click', updateStudent);
+        });
+        break;
+      case 2: {
+        document.querySelector('#section-content').classList.add('already-registered');
+
+        let dateField = document.createElement('p');
+        dateField.innerHTML = 'You completed your registration on ' + new Date(data.student[8]).toLocaleString() + '.';
+        document.querySelector('#section-content').appendChild(dateField);
+
+        let strikeField = document.createElement('p');
+        strikeField.innerHTML = 'You currently have ' + data.student[9] + ' strikes and ' + data.student[10] + ' penalties.'
+        document.querySelector('#section-content').appendChild(strikeField);
+        main.classList.remove('loading');
+      }
+      default:
+        //default is for a new student
+        student = new Array(8);
+        document.querySelectorAll('#student-info input, #class').forEach((el) => el.removeAttribute('disabled'));
+        document.querySelector('#update-info').remove();
+        document.querySelector('#confirm-info').addEventListener('click', createStudent);
+        break;
+      }
     main.classList.remove('loading');
   };
 
