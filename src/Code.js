@@ -28,7 +28,6 @@ function lookupStudent(netid) {
           'student': r
         };
 
-        Logger.log(data);
         return JSON.stringify(data);
       }
     }
