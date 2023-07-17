@@ -1,3 +1,1 @@
-# Equipment Room Signup Form
-
-Google App Script project.
+Sunsetting this code base as of 7/17/23 in favor of a modified Google Form.
